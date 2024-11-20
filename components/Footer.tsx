@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-lg font-semibold mb-4">CrestBeam</h3>
+            <h3 className="text-lg font-semibold mb-4">NaijaLoans</h3>
             <p className="text-sm text-muted-foreground">
               Your trusted financial partner in Nigeria, providing innovative loan solutions since 2024.
             </p>
