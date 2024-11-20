@@ -17,7 +17,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import emailjs from "emailjs-com";
 
 // Email validation function
-const validateEmail = (email) => {
+const validateEmail = (email: string): boolean => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
 };
@@ -34,7 +34,7 @@ export default function ContactPage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Validate email format
@@ -64,7 +64,6 @@ export default function ContactPage() {
         phone: "",
         loanType: "",
         message: "",
-        
       });
 
     } catch (error) {
@@ -117,8 +116,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Email Us</h3>
                   <p className="text-muted-foreground">
-                  Contact@Crestbeam.com.ng<br />
-                  
+                    Contact@Crestbeam.com.ng<br />
                   </p>
                 </div>
               </div>

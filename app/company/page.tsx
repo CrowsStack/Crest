@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import type { ResolvingMetadata } from 'next/dist/lib/metadata/types/metadata-interface.js';
 import { FadeInSection } from "@/components/FadeInSection";
 import { Users2, Target, Award, TrendingUp } from "lucide-react";
 
@@ -10,11 +10,7 @@ export default function CompanyPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] flex items-center justify-center text-white">
         <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80">
-          <div
-            fill
-            className="object-cover mix-blend-overlay"
-            priority
-          />
+          <div/>
         </div>
         <div className="container relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">CrestBeam</h1>
