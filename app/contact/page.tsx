@@ -13,8 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { Mail, MapPin, Phone } from "lucide-react";
-import emailjs from "emailjs-com";
 
 // Email validation function
 const validateEmail = (email: string): boolean => {
@@ -39,38 +39,55 @@ export default function ContactPage() {
 
     // Validate email format
     if (!validateEmail(formData.email)) {
-      setStatusMessage("Please enter a valid email address.");
-      return;
+        setStatusMessage("Please enter a valid email address.");
+        return;
     }
 
     setStatusMessage("Sending...");
     setIsLoading(true);
 
     try {
-      const serviceID = "default_service"; // Your EmailJS service ID
-      const templateID = "template_muluayz"; // Your EmailJS template ID
-      const userID = "dphG5MZraudQaIY5j"; // Your EmailJS User ID
+        // Prepare JSON payload
+        const jsonPayload = JSON.stringify({
+            ...formData,
+            submittedAt: new Date().toISOString(), // Add metadata if needed
+        });
 
-      // Send the form data via EmailJS
-      const result = await emailjs.send(serviceID, templateID, formData, userID);
+        // Endpoint for your Flask API
+        const response = await fetch('http://127.0.0.1:5000/api/contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: jsonPayload, // Pass the JSON payload here
+        });
 
-      setStatusMessage("Message sent successfully!");
-      console.log(result); // Log result for debugging
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Network response was not ok');
+        }
 
-      // Reset form data
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        loanType: "",
-        message: "",
-      });
+        const result = await response.json();
+        setStatusMessage(result.message);
 
+        // Reset form data
+        setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            loanType: "",
+            message: "",
+        });
+        
     } catch (error) {
-      setStatusMessage("Failed to send message, please try again.");
-      console.error(error);
+        if (error instanceof TypeError) {
+            setStatusMessage("Network error occurred. Please check your connection.");
+        } else {
+            setStatusMessage("Failed to send message, please try again.");
+        }
+        console.error("Fetch error:", error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
