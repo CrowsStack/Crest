@@ -124,7 +124,7 @@ export default function ContactPage() {
           </FadeInSection>
 
           <FadeInSection>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" netlify>
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
