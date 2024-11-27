@@ -4,8 +4,31 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import Image from 'next/image';
+import { cn } from "@/lib/utils";
 
-const faqs = [
+type Feature = {
+  id: number;
+  image: string;
+  title: string;
+  description: string;
+};
+
+type CategoryFeatures = {
+  [key: string]: Feature[];
+};
+
+type FAQ = {
+  id: string;
+  q: string;
+  a: string;
+};
+
+type Category = {
+  category: string;
+  questions: FAQ[];
+};
+
+const faqs: Category[] = [
   {
     category: "Application Process",
     questions: [
@@ -108,8 +131,7 @@ const faqs = [
   }
 ];
 
-// Category-specific feature items
-const categoryFeatures = {
+const categoryFeatures: CategoryFeatures = {
   "Application Process": [
     {
       id: 1,
@@ -216,7 +238,7 @@ const categoryFeatures = {
   ]
 };
 
-function FAQAccordion({ questions }: { questions: typeof faqs[0]['questions'] }) {
+function FAQAccordion({ questions }: { questions: FAQ[] }) {
   const [openItems, setOpenItems] = useState<string[]>([]);
 
   const toggleItem = (id: string) => {
@@ -261,7 +283,7 @@ function FAQAccordion({ questions }: { questions: typeof faqs[0]['questions'] })
   );
 }
 
-function FeatureCarousel({ items }: { items: typeof categoryFeatures["Application Process"] }) {
+function FeatureCarousel({ items }: { items: Feature[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
   const [direction, setDirection] = useState(0);
@@ -479,25 +501,27 @@ function FeatureCarousel({ items }: { items: typeof categoryFeatures["Applicatio
 }
 
 export default function FAQPage() {
-  const [selectedCategory, setSelectedCategory] = useState(faqs[0].category);
-  const currentCategory = faqs.find((cat) => cat.category === selectedCategory);
+  const [selectedCategory, setSelectedCategory] = useState<keyof typeof categoryFeatures>("Application Process");
+  const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
+
+  useEffect(() => {
+    const category = faqs.find(cat => cat.category === selectedCategory);
+    setCurrentCategory(category || null);
+  }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen py-16 bg-muted/30">
-      <div className="container max-w-4xl mx-auto px-4">
-        <h1 className="text-4xl font-bold text-center mb-4">Frequently Asked Questions</h1>
-        <p className="text-xl text-muted-foreground text-center mb-8">
-          Get instant answers about our collateral-free, paperwork-free loans
-        </p>
+    <div className="min-h-screen bg-background py-24">
+      <div className="container mx-auto px-4">
+        <h1 className="text-4xl font-bold text-center mb-16">Frequently Asked Questions</h1>
 
-        {/* Category Selector */}
-        <div className="flex flex-wrap gap-2 justify-center mb-12">
+        {/* Category Selection */}
+        <div className="flex flex-wrap justify-center gap-4 mb-16">
           {faqs.map((category) => (
             <button
               key={category.category}
               onClick={() => setSelectedCategory(category.category)}
-              className={`px-4 py-2 rounded-full transition-all duration-200 ${
-                selectedCategory === category.category
+              className={`px-6 py-3 rounded-full transition-colors duration-200 ${
+                category.category === selectedCategory
                   ? "bg-primary text-white"
                   : "bg-gray-100 hover:bg-gray-200"
               }`}
