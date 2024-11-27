@@ -129,36 +129,25 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [shouldStartAuto, setShouldStartAuto] = useState(false);
+  const [shouldStartAuto, setShouldStartAuto] = useState(true);
   const [lastInteraction, setLastInteraction] = useState(Date.now());
   const [activeQuestion, setActiveQuestion] = useState<number | null>(null);
   const [isSwiping, setIsSwiping] = useState(false);
 
-  // Start auto-sliding after 2 seconds of no interaction
-  useEffect(() => {
-    const startTimer = setTimeout(() => {
-      setShouldStartAuto(true);
-    }, 2000);
-
-    return () => clearTimeout(startTimer);
-  }, []);
-
   // Handle automatic sliding
   useEffect(() => {
-    if (!shouldStartAuto || isSwiping) return;
-
-    const timeSinceLastInteraction = Date.now() - lastInteraction;
-    if (timeSinceLastInteraction < 2000) return;
-
     const slideInterval = setInterval(() => {
-      if (!isPaused) {
+      const timeSinceLastInteraction = Date.now() - lastInteraction;
+      
+      if (timeSinceLastInteraction >= 2000 && !isSwiping) {
         setDirection(1);
         setCurrentIndex((current) => getNextIndex(1));
+        setIsPaused(false);
       }
     }, 5000);
 
     return () => clearInterval(slideInterval);
-  }, [isPaused, shouldStartAuto, lastInteraction, isSwiping]);
+  }, [lastInteraction, isSwiping]);
 
   const getNextIndex = (step: number) => {
     const nextIndex = currentIndex + step;
@@ -167,33 +156,21 @@ export default function Home() {
     return nextIndex;
   };
 
+  const handleSwipe = (info: any) => {
+    setIsSwiping(true);
+    if (Math.abs(info.offset.x) > 100) {
+      const direction = info.offset.x > 0 ? -1 : 1;
+      setDirection(direction);
+      setCurrentIndex(current => getNextIndex(direction));
+      setLastInteraction(Date.now());
+    }
+    setTimeout(() => setIsSwiping(false), 100);
+  };
+
   const handleDotClick = (index: number) => {
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
     setLastInteraction(Date.now());
-  };
-
-  const handleSwipe = (swipeInfo: any) => {
-    const swipeThreshold = 50; // minimum distance for a swipe
-    const xOffset = swipeInfo.offset.x;
-    
-    if (Math.abs(xOffset) > swipeThreshold) {
-      setIsSwiping(true);
-      setLastInteraction(Date.now());
-      
-      if (xOffset > 0) {
-        // Swipe right - go to previous
-        setDirection(-1);
-        setCurrentIndex(current => getNextIndex(-1));
-      } else {
-        // Swipe left - go to next
-        setDirection(1);
-        setCurrentIndex(current => getNextIndex(1));
-      }
-
-      // Reset swiping state after animation
-      setTimeout(() => setIsSwiping(false), 500);
-    }
   };
 
   const calculateMonthlyPayment = () => {
@@ -432,6 +409,11 @@ export default function Home() {
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.2}
                   onDragEnd={(_, info) => handleSwipe(info)}
+                  onDragStart={() => setIsSwiping(true)}
+                  onClick={() => {
+                    setLastInteraction(Date.now());
+                    setIsPaused(true);
+                  }}
                   whileTap={{ cursor: "grabbing" }}
                 >
                   {/* Mobile Swipe Indicator - Only visible initially */}
@@ -493,6 +475,7 @@ export default function Home() {
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.2}
                     onDragEnd={(_, info) => handleSwipe(info)}
+                    onDragStart={() => setIsSwiping(true)}
                     whileTap={{ cursor: "grabbing" }}
                   >
                     <AnimatePresence mode="wait" custom={direction}>
