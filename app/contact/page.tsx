@@ -27,7 +27,7 @@ export default function ContactPage() {
     name: "",
     email: "",
     phone: "",
-    loanType: "",
+    service: "",
     message: "",
   });
   
@@ -51,7 +51,7 @@ export default function ContactPage() {
             submittedAt: new Date().toISOString(),
         });
 
-        const response = await fetch('http://127.0.0.1:8000', {
+        const response = await fetch('/api/contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ export default function ContactPage() {
             name: "",
             email: "",
             phone: "",
-            loanType: "",
+            service: "",
             message: "",
         });
 
@@ -180,21 +180,21 @@ export default function ContactPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="loanType">Loan Type</Label>
+                <Label htmlFor="service">Service</Label>
                 <Select
-                  value={formData.loanType}
+                  value={formData.service}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, loanType: value })
+                    setFormData({ ...formData, service: value })
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select loan type" />
+                    <SelectValue placeholder="Select service" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="personal">Personal Loan</SelectItem>
-                    <SelectItem value="business">Business Loan</SelectItem>
-                    <SelectItem value="mortgage">Mortgage Loan</SelectItem>
-                    <SelectItem value="equipment">Equipment Financing</SelectItem>
+                    <SelectItem value="personal">Personal Service</SelectItem>
+                    <SelectItem value="business">Business Service</SelectItem>
+                    <SelectItem value="mortgage">Mortgage Service</SelectItem>
+                    <SelectItem value="equipment">Equipment Service</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
