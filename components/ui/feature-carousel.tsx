@@ -48,29 +48,59 @@ const carouselItems: CarouselItem[] = [
 export default function FeatureCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
+  const [direction, setDirection] = useState(0);
+  const [lastInteraction, setLastInteraction] = useState<number | null>(null);
 
   useEffect(() => {
     if (!autoplay) return;
+
+    // Check if we need to wait after user interaction
+    if (lastInteraction) {
+      const timeSinceInteraction = Date.now() - lastInteraction;
+      if (timeSinceInteraction < 5000) {
+        const timeout = setTimeout(() => {
+          setCurrentIndex((prevIndex) => 
+            prevIndex === carouselItems.length - 1 ? 0 : prevIndex + 1
+          );
+          setDirection(1);
+        }, 5000 - timeSinceInteraction);
+        return () => clearTimeout(timeout);
+      }
+    }
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => 
         prevIndex === carouselItems.length - 1 ? 0 : prevIndex + 1
       );
+      setDirection(1);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [autoplay]);
+  }, [autoplay, lastInteraction]);
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === carouselItems.length - 1 ? 0 : prevIndex + 1
-    );
+  const handleDotClick = (index: number) => {
+    // Calculate direction based on distance and position
+    const distance = index - currentIndex;
+    const newDirection = distance > 0 ? 1 : -1;
+    
+    // For wrapping cases (e.g., going from last to first or vice versa)
+    if (Math.abs(distance) > carouselItems.length / 2) {
+      setDirection(-newDirection); // Reverse direction for shorter path
+    } else {
+      setDirection(newDirection);
+    }
+    
+    setCurrentIndex(index);
+    setLastInteraction(Date.now());
   };
 
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? carouselItems.length - 1 : prevIndex - 1
-    );
+  const handleMouseEnter = () => {
+    setAutoplay(false);
+  };
+
+  const handleMouseLeave = () => {
+    setAutoplay(true);
+    setLastInteraction(Date.now());
   };
 
   const getNextIndex = (offset: number) => {
@@ -86,13 +116,32 @@ export default function FeatureCarousel() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center min-h-[700px]">
           {/* Image Column */}
           <div className="relative h-[600px] bg-gradient-to-b from-primary/10 to-primary/5 rounded-2xl overflow-hidden">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
+                custom={direction}
+                initial={{ 
+                  opacity: 0,
+                  y: direction * 100,
+                  scale: 0.95
+                }}
+                animate={{ 
+                  opacity: 1,
+                  y: 0,
+                  scale: 1
+                }}
+                exit={{ 
+                  opacity: 0,
+                  y: direction * -100,
+                  scale: 0.95
+                }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  mass: 0.8,
+                  duration: 0.5 
+                }}
                 className="absolute inset-0 flex items-center justify-center p-12"
               >
                 <Image
@@ -110,27 +159,45 @@ export default function FeatureCarousel() {
           {/* Text Column */}
           <div className="relative min-h-[600px] flex flex-col justify-center">
             {/* Previous Text Preview */}
-            <div className="mb-12 opacity-50">
-              <h4 className="text-sm font-medium text-primary">Previous</h4>
-              <p className="text-muted-foreground text-lg">
+            <div className="mb-16 opacity-50">
+              <p className="text-muted-foreground text-xl">
                 {carouselItems[getNextIndex(-1)].title}
               </p>
             </div>
 
             {/* Current Text */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="mb-12"
+                custom={direction}
+                initial={{ 
+                  opacity: 0,
+                  y: direction * 75,
+                  scale: 0.98
+                }}
+                animate={{ 
+                  opacity: 1,
+                  y: 0,
+                  scale: 1
+                }}
+                exit={{ 
+                  opacity: 0,
+                  y: direction * -75,
+                  scale: 0.98
+                }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  mass: 0.8,
+                  duration: 0.5 
+                }}
+                className="mb-16"
               >
-                <h3 className="text-4xl font-bold mb-6">
+                <h3 className="text-5xl font-bold mb-8">
                   {carouselItems[currentIndex].title}
                 </h3>
-                <p className="text-xl text-muted-foreground leading-relaxed">
+                <p className="text-2xl text-muted-foreground leading-relaxed">
                   {carouselItems[currentIndex].description}
                 </p>
               </motion.div>
@@ -138,45 +205,30 @@ export default function FeatureCarousel() {
 
             {/* Next Text Preview */}
             <div className="opacity-50">
-              <h4 className="text-sm font-medium text-primary">Next</h4>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-xl">
                 {carouselItems[getNextIndex(1)].title}
               </p>
             </div>
 
-            {/* Navigation Controls */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-6">
-              <button
-                onClick={prevSlide}
-                className="p-3 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
-                onMouseEnter={() => setAutoplay(false)}
-                onMouseLeave={() => setAutoplay(true)}
-              >
-                <ChevronUp className="w-8 h-8" />
-              </button>
-              <button
-                onClick={nextSlide}
-                className="p-3 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
-                onMouseEnter={() => setAutoplay(false)}
-                onMouseLeave={() => setAutoplay(true)}
-              >
-                <ChevronDown className="w-8 h-8" />
-              </button>
-            </div>
-
             {/* Progress Indicators */}
-            <div className="absolute -left-20 h-full flex flex-col justify-between py-8">
+            <div className="absolute -left-12 h-full flex flex-col justify-between py-8">
               {carouselItems.map((_, index) => (
                 <div
                   key={index}
                   className="relative group cursor-pointer"
-                  onClick={() => setCurrentIndex(index)}
+                  onClick={() => handleDotClick(index)}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
                 >
                   {/* Dot Container */}
                   <div className="relative">
                     {/* Background Circle - Only visible when active */}
                     {index === currentIndex && (
-                      <div className="w-8 h-8 rounded-full bg-primary scale-110 shadow-lg transition-all duration-300" />
+                      <motion.div 
+                        layoutId="activeDot"
+                        className="w-8 h-8 rounded-full bg-primary scale-110 shadow-lg"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
                     )}
                     
                     {/* Center Dot */}
