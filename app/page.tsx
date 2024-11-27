@@ -88,7 +88,7 @@ const testimonials = [
   {
     name: "Grace Obasanjo",
     role: "Beauty Salon Owner",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d04cb21cd6c?q=80&w=1976&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
     content: "CrestBeam's support helped me transform my small salon into a full-service beauty center. Their faith in small businesses and supportive approach make them the best choice.",
     rating: 5
   },
@@ -488,7 +488,7 @@ export default function Home() {
 
                   {/* Image Column */}
                   <motion.div 
-                    className="relative h-[600px] bg-gradient-to-b from-primary/10 to-primary/5 md:rounded-2xl rounded-full overflow-hidden order-2 md:order-1"
+                    className="relative h-[600px] bg-gradient-to-b from-primary/10 to-primary/5 rounded-2xl overflow-hidden order-2 md:order-1"
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.2}
@@ -646,7 +646,7 @@ export default function Home() {
                           ease: "linear"
                         }}
                       />
-                    </motion.div>
+                    </div>
                   </div>
                 </motion.div>
               </div>
