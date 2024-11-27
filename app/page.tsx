@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { BadgeCheck, Banknote, Building2, Calculator, Star, Quote, ChevronDown, 
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import Head from 'next/head';
 
 const loanTypes = [
   {
@@ -66,7 +67,7 @@ const testimonials = [
   {
     name: "Emmanuel Okafor",
     role: "Transport Service Provider",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1500648767791-dfedbc827105?q=80&w=1974&auto=format&fit=crop",
     content: "Thanks to CrestBeam, I was able to expand my transport fleet. Their professional approach and quick processing made the entire experience smooth and stress-free.",
     rating: 5
   },
@@ -80,7 +81,7 @@ const testimonials = [
   {
     name: "Yusuf Abdullahi",
     role: "Agricultural Supplier",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf21cfd?q=80&w=1974&auto=format&fit=crop",
     content: "The agricultural sector needs flexible financing, and CrestBeam delivers exactly that. Their understanding of farming cycles and seasonal needs sets them apart.",
     rating: 5
   },
@@ -101,7 +102,7 @@ const testimonials = [
   {
     name: "Amina Bello",
     role: "Education Services Provider",
-    image: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?q=80&w=1974&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1489424731084-5658abf4ff4e?q=80&w=1974&auto=format&fit=crop",
     content: "CrestBeam helped me establish my tutorial center with their education-focused loan package. Their commitment to supporting educational initiatives in Nigeria is commendable.",
     rating: 5
   }
@@ -123,9 +124,77 @@ const quickFAQs = [
 ];
 
 export default function Home() {
-  const [loanAmount, setLoanAmount] = useState(100000);
+  const [loanAmount, setLoanAmount] = useState(500000);
   const [loanTerm, setLoanTerm] = useState(12);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [shouldStartAuto, setShouldStartAuto] = useState(false);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
   const [activeQuestion, setActiveQuestion] = useState<number | null>(null);
+  const [isSwiping, setIsSwiping] = useState(false);
+
+  // Start auto-sliding after 3 seconds of no interaction
+  useEffect(() => {
+    const startTimer = setTimeout(() => {
+      setShouldStartAuto(true);
+    }, 3000);
+
+    return () => clearTimeout(startTimer);
+  }, []);
+
+  // Handle automatic sliding
+  useEffect(() => {
+    if (!shouldStartAuto || isSwiping) return;
+
+    const timeSinceLastInteraction = Date.now() - lastInteraction;
+    if (timeSinceLastInteraction < 3000) return;
+
+    const slideInterval = setInterval(() => {
+      if (!isPaused) {
+        setDirection(1);
+        setCurrentIndex((current) => getNextIndex(1));
+      }
+    }, 5000);
+
+    return () => clearInterval(slideInterval);
+  }, [isPaused, shouldStartAuto, lastInteraction, isSwiping]);
+
+  const getNextIndex = (step: number) => {
+    const nextIndex = currentIndex + step;
+    if (nextIndex < 0) return testimonials.length - 1;
+    if (nextIndex >= testimonials.length) return 0;
+    return nextIndex;
+  };
+
+  const handleDotClick = (index: number) => {
+    setDirection(index > currentIndex ? 1 : -1);
+    setCurrentIndex(index);
+    setLastInteraction(Date.now());
+  };
+
+  const handleSwipe = (swipeInfo: any) => {
+    const swipeThreshold = 50; // minimum distance for a swipe
+    const yOffset = swipeInfo.offset.y;
+    
+    if (Math.abs(yOffset) > swipeThreshold) {
+      setIsSwiping(true);
+      setLastInteraction(Date.now());
+      
+      if (yOffset > 0) {
+        // Swipe down - go to previous
+        setDirection(-1);
+        setCurrentIndex(current => getNextIndex(-1));
+      } else {
+        // Swipe up - go to next
+        setDirection(1);
+        setCurrentIndex(current => getNextIndex(1));
+      }
+
+      // Reset swiping state after animation
+      setTimeout(() => setIsSwiping(false), 500);
+    }
+  };
 
   const calculateMonthlyPayment = () => {
     const interestRate = 0.15; // 15% annual interest rate
@@ -137,6 +206,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Head>
+        <title>CrestBeam</title>
+      </Head>
       {/* Hero Section */}
       <section className="relative h-[800px] flex items-center justify-center text-white">
         <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80">
@@ -348,38 +420,220 @@ export default function Home() {
         <section className="py-24 bg-muted/50">
           <div className="container">
             <h2 className="text-4xl font-bold text-center mb-16">What Our Clients Say</h2>
-            <AutoCarousel
-              items={testimonials}
-              className="w-full max-w-7xl mx-auto px-4"
-              renderItem={(testimonial, index) => (
-                <div className="p-4 h-full flex items-center">
-                  <div className="p-8 bg-background rounded-lg shadow-lg h-full w-full">
-                    <div className="flex flex-col items-center text-center h-full justify-between space-y-6">
-                      <Quote className="w-12 h-12 text-primary opacity-50" />
-                      <p className="text-muted-foreground text-lg md:text-xl italic">
-                        "{testimonial.content}"
-                      </p>
-                      <div className="flex flex-col items-center">
-                        <div className="w-20 h-20 rounded-full overflow-hidden mb-4">
-                          <img 
-                            src={testimonial.image} 
-                            alt={testimonial.name}
-                            className="w-full h-full object-cover"
+            <motion.div 
+              className="w-full bg-muted/30 py-16 rounded-2xl"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
+              <div className="container mx-auto px-4">
+                <motion.div 
+                  className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center min-h-[700px]"
+                  drag="y"
+                  dragConstraints={{ top: 0, bottom: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={(_, info) => handleSwipe(info)}
+                  whileTap={{ cursor: "grabbing" }}
+                >
+                  {/* Swipe Indicator - Only visible on mobile */}
+                  <div className="absolute inset-x-0 top-4 flex flex-col items-center gap-1 md:hidden pointer-events-none">
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0, 1, 0] }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 1
+                      }}
+                      className="text-sm text-muted-foreground"
+                    >
+                      Swipe up or down
+                    </motion.div>
+                    <motion.div
+                      animate={{ y: [0, 5, 0] }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 1
+                      }}
+                      className="w-1 h-6 bg-primary/20 rounded-full"
+                    />
+                  </div>
+
+                  {/* Image Column */}
+                  <motion.div 
+                    className="relative h-[600px] bg-gradient-to-b from-primary/10 to-primary/5 rounded-2xl overflow-hidden order-2 md:order-1"
+                    drag="y"
+                    dragConstraints={{ top: 0, bottom: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(_, info) => handleSwipe(info)}
+                    whileTap={{ cursor: "grabbing" }}
+                  >
+                    {/* Swipe Indicator - Only visible on mobile */}
+                    <div className="absolute inset-x-0 top-4 z-10 flex flex-col items-center gap-1 md:hidden pointer-events-none">
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ 
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatDelay: 1
+                        }}
+                        className="text-sm text-white/80 drop-shadow-md"
+                      >
+                        Swipe up or down
+                      </motion.div>
+                      <motion.div
+                        animate={{ y: [0, 5, 0] }}
+                        transition={{ 
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatDelay: 1
+                        }}
+                        className="w-1 h-6 bg-white/50 rounded-full"
+                      />
+                    </div>
+
+                    <AnimatePresence mode="wait" custom={direction}>
+                      <motion.div
+                        key={currentIndex}
+                        custom={direction}
+                        initial={{ 
+                          opacity: 0,
+                          y: direction * 100,
+                          scale: 0.95
+                        }}
+                        animate={{ 
+                          opacity: 1,
+                          y: 0,
+                          scale: 1
+                        }}
+                        exit={{ 
+                          opacity: 0,
+                          y: direction * -100,
+                          scale: 0.95
+                        }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                          mass: 0.8,
+                          duration: 0.5 
+                        }}
+                        className="absolute inset-0 flex items-center justify-center p-12"
+                      >
+                        <div className="w-full h-full relative">
+                          <Image
+                            src={testimonials[currentIndex].image}
+                            alt={testimonials[currentIndex].name}
+                            fill
+                            className="object-cover rounded-xl"
+                            priority
                           />
                         </div>
-                        <div className="flex items-center gap-1 mb-2">
-                          {[...Array(testimonial.rating)].map((_, i) => (
-                            <Star key={i} className="w-5 h-5 fill-primary text-primary" />
-                          ))}
+                      </motion.div>
+                    </AnimatePresence>
+                  </motion.div>
+
+                  {/* Text Column */}
+                  <div className="relative min-h-[600px] flex flex-col justify-center order-1 md:order-2 px-6">
+                    {/* Previous Text Preview */}
+                    <div className="mb-12 opacity-50 transition-opacity duration-300">
+                      <p className="text-muted-foreground text-lg">
+                        {testimonials[getNextIndex(-1)].name}
+                      </p>
+                    </div>
+
+                    {/* Current Text */}
+                    <AnimatePresence mode="wait" custom={direction}>
+                      <motion.div
+                        key={currentIndex}
+                        custom={direction}
+                        initial={{ 
+                          opacity: 0,
+                          y: direction * 75,
+                          scale: 0.98
+                        }}
+                        animate={{ 
+                          opacity: 1,
+                          y: 0,
+                          scale: 1
+                        }}
+                        exit={{ 
+                          opacity: 0,
+                          y: direction * -75,
+                          scale: 0.98
+                        }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                          mass: 0.8,
+                          duration: 0.5 
+                        }}
+                        className="mb-12"
+                      >
+                        <Quote className="w-12 h-12 text-primary opacity-50 mb-6" />
+                        <p className="text-2xl font-medium mb-8 leading-relaxed">
+                          "{testimonials[currentIndex].content}"
+                        </p>
+                        <div className="space-y-2">
+                          <h3 className="text-2xl font-bold">{testimonials[currentIndex].name}</h3>
+                          <p className="text-muted-foreground text-lg">{testimonials[currentIndex].role}</p>
+                          <div className="flex items-center gap-1">
+                            {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
+                              <Star key={i} className="w-5 h-5 fill-primary text-primary" />
+                            ))}
+                          </div>
                         </div>
-                        <h3 className="text-xl font-semibold">{testimonial.name}</h3>
-                        <p className="text-muted-foreground">{testimonial.role}</p>
-                      </div>
+                      </motion.div>
+                    </AnimatePresence>
+
+                    {/* Next Text Preview */}
+                    <div className="opacity-50 transition-opacity duration-300">
+                      <p className="text-muted-foreground text-lg">
+                        {testimonials[getNextIndex(1)].name}
+                      </p>
+                    </div>
+
+                    {/* Navigation Dots */}
+                    <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-2 pb-8">
+                      {testimonials.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleDotClick(index)}
+                          className={cn(
+                            "w-2.5 h-2.5 rounded-full transition-all duration-500",
+                            currentIndex === index
+                              ? "bg-primary w-6"
+                              : "bg-primary/50 hover:bg-primary/75"
+                          )}
+                          aria-label={`Go to testimonial ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Auto-play Indicator */}
+                    <div 
+                      className={cn(
+                        "absolute top-0 left-0 right-0 h-1 bg-primary/10 overflow-hidden transition-opacity duration-300",
+                        isPaused || !shouldStartAuto ? "opacity-0" : "opacity-100"
+                      )}
+                    >
+                      <motion.div
+                        className="h-full bg-primary"
+                        initial={{ scaleX: 0, transformOrigin: "left" }}
+                        animate={{ scaleX: shouldStartAuto ? 1 : 0 }}
+                        transition={{
+                          duration: 5,
+                          repeat: Infinity,
+                          ease: "linear"
+                        }}
+                      />
                     </div>
                   </div>
-                </div>
-              )}
-            />
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
         </section>
       </FadeInSection>
@@ -445,7 +699,6 @@ export default function Home() {
           </div>
         </section>
       </FadeInSection>
-
     </div>
   );
 }

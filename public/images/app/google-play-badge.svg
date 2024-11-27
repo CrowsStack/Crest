@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60">
+    <rect width="200" height="60" rx="8" fill="#000000"/>
+    <g transform="translate(15,15)">
+        <!-- Play Store Triangle -->
+        <path d="M15.27 0L.32 15.44a1 1 0 0 0 0 1.41l14.95 15.44a1 1 0 0 0 1.41 0L31.63 16.85a1 1 0 0 0 0-1.41L16.68 0a1 1 0 0 0-1.41 0z" fill="#EA4335"/>
+        <!-- Play Store Square -->
+        <path d="M15.27 0L.32 15.44a1 1 0 0 0 0 1.41l14.95 15.44a1 1 0 0 0 1.41 0L31.63 16.85a1 1 0 0 0 0-1.41L16.68 0a1 1 0 0 0-1.41 0z" fill="#34A853"/>
+        <!-- Play Store Circle -->
+        <path d="M15.27 0L.32 15.44a1 1 0 0 0 0 1.41l14.95 15.44a1 1 0 0 0 1.41 0L31.63 16.85a1 1 0 0 0 0-1.41L16.68 0a1 1 0 0 0-1.41 0z" fill="#4285F4"/>
+        <!-- Play Store Arrow -->
+        <path d="M15.27 0L.32 15.44a1 1 0 0 0 0 1.41l14.95 15.44a1 1 0 0 0 1.41 0L31.63 16.85a1 1 0 0 0 0-1.41L16.68 0a1 1 0 0 0-1.41 0z" fill="#FBBC04"/>
+    </g>
+    <text x="65" y="25" fill="white" font-family="Arial" font-size="10">GET IT ON</text>
+    <text x="65" y="45" fill="white" font-family="Arial" font-size="16" font-weight="bold">Google Play</text>
+</svg>
