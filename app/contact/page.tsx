@@ -108,7 +108,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Visit Us</h3>
                   <p className="text-muted-foreground">
-                    123 Victoria Island<br />
+                    Gbagada<br />
                     Lagos, Nigeria
                   </p>
                 </div>

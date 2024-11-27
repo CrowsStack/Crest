@@ -175,18 +175,18 @@ export default function Home() {
 
   const handleSwipe = (swipeInfo: any) => {
     const swipeThreshold = 50; // minimum distance for a swipe
-    const yOffset = swipeInfo.offset.y;
+    const xOffset = swipeInfo.offset.x;
     
-    if (Math.abs(yOffset) > swipeThreshold) {
+    if (Math.abs(xOffset) > swipeThreshold) {
       setIsSwiping(true);
       setLastInteraction(Date.now());
       
-      if (yOffset > 0) {
-        // Swipe down - go to previous
+      if (xOffset > 0) {
+        // Swipe right - go to previous
         setDirection(-1);
         setCurrentIndex(current => getNextIndex(-1));
       } else {
-        // Swipe up - go to next
+        // Swipe left - go to next
         setDirection(1);
         setCurrentIndex(current => getNextIndex(1));
       }
@@ -427,43 +427,137 @@ export default function Home() {
             >
               <div className="container mx-auto px-4">
                 <motion.div 
-                  className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center min-h-[700px]"
-                  drag="y"
-                  dragConstraints={{ top: 0, bottom: 0 }}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center min-h-[700px] relative"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.2}
                   onDragEnd={(_, info) => handleSwipe(info)}
                   whileTap={{ cursor: "grabbing" }}
                 >
-                  {/* Swipe Indicator - Only visible on mobile */}
-                  <div className="absolute inset-x-0 top-4 flex flex-col items-center gap-1 md:hidden pointer-events-none">
+                  {/* Slider Progress Bar - Always visible */}
+                  <div className="absolute -top-8 left-0 right-0 h-1 bg-primary/10 rounded-full overflow-hidden">
                     <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ 
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatDelay: 1
-                      }}
-                      className="text-sm text-muted-foreground"
-                    >
-                      Swipe up or down
-                    </motion.div>
-                    <motion.div
-                      animate={{ y: [0, 5, 0] }}
-                      transition={{ 
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatDelay: 1
-                      }}
-                      className="w-1 h-6 bg-primary/20 rounded-full"
+                      className="h-full bg-primary"
+                      initial={{ width: `${(currentIndex / (testimonials.length - 1)) * 100}%` }}
+                      animate={{ width: `${(currentIndex / (testimonials.length - 1)) * 100}%` }}
+                      transition={{ duration: 0.5 }}
                     />
+                  </div>
+
+                  {/* Slider Arrows - Hidden on mobile */}
+                  <button 
+                    onClick={() => {
+                      setDirection(-1);
+                      setCurrentIndex(current => getNextIndex(-1));
+                      setLastInteraction(Date.now());
+                    }}
+                    className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-lg items-center justify-center group transition-all duration-200"
+                    aria-label="Previous slide"
+                  >
+                    <motion.svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="24" 
+                      height="24" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                      className="group-hover:-translate-x-0.5 transition-transform duration-200"
+                    >
+                      <path d="m15 18-6-6 6-6"/>
+                    </motion.svg>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setDirection(1);
+                      setCurrentIndex(current => getNextIndex(1));
+                      setLastInteraction(Date.now());
+                    }}
+                    className="hidden md:flex absolute -right-16 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-lg items-center justify-center group transition-all duration-200"
+                    aria-label="Next slide"
+                  >
+                    <motion.svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="24" 
+                      height="24" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                      className="group-hover:translate-x-0.5 transition-transform duration-200"
+                    >
+                      <path d="m9 18 6-6-6-6"/>
+                    </motion.svg>
+                  </button>
+
+                  {/* Mobile Swipe Indicator - Only visible initially */}
+                  <motion.div
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 0 }}
+                    transition={{ delay: 3, duration: 0.5 }}
+                    className="absolute inset-x-0 top-4 flex flex-col items-center gap-1 md:hidden pointer-events-none"
+                  >
+                    <div className="flex items-center gap-2">
+                      <motion.svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        animate={{ x: [-3, 3, -3] }}
+                        transition={{ 
+                          duration: 1.5,
+                          repeat: Infinity,
+                          repeatType: "reverse"
+                        }}
+                      >
+                        <path d="m9 18 6-6-6-6"/>
+                      </motion.svg>
+                      <span className="text-sm text-muted-foreground">
+                        Slide to explore
+                      </span>
+                      <motion.svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        animate={{ x: [-3, 3, -3] }}
+                        transition={{ 
+                          duration: 1.5,
+                          repeat: Infinity,
+                          repeatType: "reverse"
+                        }}
+                      >
+                        <path d="m15 18-6-6 6-6"/>
+                      </motion.svg>
+                    </div>
+                  </motion.div>
+
+                  {/* Slide Counter - Always visible */}
+                  <div className="absolute -top-12 left-0 text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{currentIndex + 1}</span>
+                    <span className="mx-1">/</span>
+                    <span>{testimonials.length}</span>
                   </div>
 
                   {/* Image Column */}
                   <motion.div 
                     className="relative h-[600px] bg-gradient-to-b from-primary/10 to-primary/5 rounded-2xl overflow-hidden order-2 md:order-1"
-                    drag="y"
-                    dragConstraints={{ top: 0, bottom: 0 }}
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.2}
                     onDragEnd={(_, info) => handleSwipe(info)}
                     whileTap={{ cursor: "grabbing" }}
@@ -480,16 +574,16 @@ export default function Home() {
                         }}
                         className="text-sm text-white/80 drop-shadow-md"
                       >
-                        Swipe up or down
+                        Swipe left or right
                       </motion.div>
                       <motion.div
-                        animate={{ y: [0, 5, 0] }}
+                        animate={{ x: [-5, 5, -5] }}
                         transition={{ 
                           duration: 2,
                           repeat: Infinity,
                           repeatDelay: 1
                         }}
-                        className="w-1 h-6 bg-white/50 rounded-full"
+                        className="w-6 h-1 bg-white/50 rounded-full"
                       />
                     </div>
 
@@ -499,17 +593,17 @@ export default function Home() {
                         custom={direction}
                         initial={{ 
                           opacity: 0,
-                          y: direction * 100,
+                          x: direction * 100,
                           scale: 0.95
                         }}
                         animate={{ 
                           opacity: 1,
-                          y: 0,
+                          x: 0,
                           scale: 1
                         }}
                         exit={{ 
                           opacity: 0,
-                          y: direction * -100,
+                          x: direction * -100,
                           scale: 0.95
                         }}
                         transition={{ 
@@ -550,17 +644,17 @@ export default function Home() {
                         custom={direction}
                         initial={{ 
                           opacity: 0,
-                          y: direction * 75,
+                          x: direction * 75,
                           scale: 0.98
                         }}
                         animate={{ 
                           opacity: 1,
-                          y: 0,
+                          x: 0,
                           scale: 1
                         }}
                         exit={{ 
                           opacity: 0,
-                          y: direction * -75,
+                          x: direction * -75,
                           scale: 0.98
                         }}
                         transition={{ 
@@ -596,19 +690,34 @@ export default function Home() {
                     </div>
 
                     {/* Navigation Dots */}
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-2 pb-8">
+                    <div className="absolute -bottom-12 left-0 right-0 flex justify-center gap-2">
                       {testimonials.map((_, index) => (
                         <button
                           key={index}
                           onClick={() => handleDotClick(index)}
-                          className={cn(
-                            "w-2.5 h-2.5 rounded-full transition-all duration-500",
-                            currentIndex === index
-                              ? "bg-primary w-6"
-                              : "bg-primary/50 hover:bg-primary/75"
-                          )}
-                          aria-label={`Go to testimonial ${index + 1}`}
-                        />
+                          className="group p-2"
+                          aria-label={`Go to slide ${index + 1}`}
+                        >
+                          <div className="relative">
+                            {/* Active dot background */}
+                            {index === currentIndex && (
+                              <motion.div 
+                                layoutId="activeDot"
+                                className="absolute inset-0 -m-1 rounded-full bg-primary/20"
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                              />
+                            )}
+                            {/* Dot */}
+                            <div 
+                              className={cn(
+                                "w-2 h-2 rounded-full transition-all duration-300",
+                                index === currentIndex 
+                                  ? "bg-primary scale-100" 
+                                  : "bg-primary/30 scale-75 group-hover:scale-100 group-hover:bg-primary/50"
+                              )}
+                            />
+                          </div>
+                        </button>
                       ))}
                     </div>
 

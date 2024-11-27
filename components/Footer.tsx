@@ -43,7 +43,8 @@ export function Footer() {
             <div>
               <h4 className="text-sm font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Gbagada</li>
+                <li>Gbagada<br />
+                Lagos, Nigeria</li>
                 <li></li>
                 <li>Phone: +234 123 XXX XXXX</li>
                 <li>Email: Contact@Crestbeam.com.ng</li>
