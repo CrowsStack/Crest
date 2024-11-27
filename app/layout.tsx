@@ -8,7 +8,7 @@ import { ThemeProvider } from 'next-themes';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'NaijaLoans - Your Trusted Financial Partner',
+  title: 'CrestBeam - Your Trusted Financial Partner',
   description: 'Leading loan provider in Nigeria offering personal, business, and mortgage loans with competitive rates.',
 };
 
