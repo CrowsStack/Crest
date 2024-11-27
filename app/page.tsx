@@ -205,11 +205,11 @@ export default function Home() {
             Get instant approval with zero paperwork. Your financial goals are just a click away!
           </p>
           <div className="flex gap-4 justify-center">
-            <Button size="lg" variant="secondary" asChild>
+            <Button size="lg" className="text-black bg-white  hover:text-white hover:bg-transparent">
               <Link href="/contact">Apply Now</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/products">Learn More</Link>
+            <Button size="lg" className="text-white bg-black-200" variant="outline" asChild>
+              <Link href="/products" >Learn More</Link>
             </Button>
           </div>
         </div>
