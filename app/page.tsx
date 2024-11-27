@@ -446,7 +446,6 @@ export default function Home() {
         </section>
       </FadeInSection>
 
-      <Footer />
     </div>
   );
 }
