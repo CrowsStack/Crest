@@ -530,7 +530,12 @@ export default function FAQPage() {
             </button>
           ))}
         </div>
+         {/* FAQ Items */}
+         {currentCategory && <FAQAccordion questions={currentCategory.questions} />}
+         <span>      
 
+           <br></br>
+         </span>
         {/* Feature Carousel Section */}
         <div className="mb-16">
           {/* Carousel Title - Always at top */}
@@ -539,9 +544,6 @@ export default function FAQPage() {
           </h2>
           <FeatureCarousel items={categoryFeatures[selectedCategory]} />
         </div>
-
-        {/* FAQ Items */}
-        {currentCategory && <FAQAccordion questions={currentCategory.questions} />}
       </div>
     </div>
   );

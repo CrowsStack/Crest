@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FadeInSection } from "@/components/FadeInSection";
 import { AutoCarousel } from "@/components/ui/auto-carousel";
-import { BadgeCheck, Banknote, Building2, Calculator, Star, Quote, ChevronDown, Users, Timer, TrendingUp } from "lucide-react";
+import { BadgeCheck, Banknote, Building2, Calculator, Star, Quote, ChevronDown, Users, Timer, TrendingUp, User } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -39,70 +39,60 @@ const testimonials = [
   {
     name: "Oluwaseun Adebayo",
     role: "Small Business Owner",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
     content: "CrestBeam's nano-lending service helped me expand my grocery store. The quick approval process and flexible repayment terms made it possible to stock up inventory during peak seasons.",
     rating: 5
   },
   {
     name: "Chidinma Okonkwo",
     role: "Market Trader",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop",
     content: "I've tried several lending platforms, but CrestBeam stands out. Their customer service is exceptional, and the loan process is straightforward. They truly understand the needs of small traders.",
     rating: 5
   },
   {
     name: "Ibrahim Musa",
     role: "Tech Entrepreneur",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1970&auto=format&fit=crop",
     content: "The micro-lending option from CrestBeam was instrumental in helping me purchase essential equipment for my startup. Their competitive rates and quick disbursement made all the difference.",
     rating: 5
   },
   {
     name: "Aisha Mohammed",
     role: "Restaurant Owner",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1970&auto=format&fit=crop",
     content: "CrestBeam's business loan helped me renovate my restaurant during the off-peak season. Their understanding of seasonal business cycles and flexible terms were exactly what I needed.",
     rating: 5
   },
   {
     name: "Emmanuel Okafor",
     role: "Transport Service Provider",
-    image: "https://images.unsplash.com/photo-1500648767791-dfedbc827105?q=80&w=1974&auto=format&fit=crop",
     content: "Thanks to CrestBeam, I was able to expand my transport fleet. Their professional approach and quick processing made the entire experience smooth and stress-free.",
     rating: 5
   },
   {
     name: "Folake Adeleke",
     role: "Fashion Designer",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop",
     content: "CrestBeam understood my vision when other lenders didn't. Their micro-lending service helped me purchase industrial sewing machines and expand my workshop.",
     rating: 5
   },
   {
     name: "Yusuf Abdullahi",
     role: "Agricultural Supplier",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf21cfd?q=80&w=1974&auto=format&fit=crop",
     content: "The agricultural sector needs flexible financing, and CrestBeam delivers exactly that. Their understanding of farming cycles and seasonal needs sets them apart.",
     rating: 5
   },
   {
     name: "Grace Obasanjo",
     role: "Beauty Salon Owner",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
     content: "CrestBeam's support helped me transform my small salon into a full-service beauty center. Their faith in small businesses and supportive approach make them the best choice.",
     rating: 5
   },
   {
     name: "Victor Nnamdi",
     role: "Electronics Retailer",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1974&auto=format&fit=crop",
     content: "The efficiency of CrestBeam's loan process is unmatched. Within days, I was able to stock up on new inventory and expand my product range. Their platform is truly revolutionary.",
     rating: 5
   },
   {
     name: "Amina Bello",
     role: "Education Services Provider",
-    image: "https://images.unsplash.com/photo-1489424731084-5658abf4ff4e?q=80&w=1974&auto=format&fit=crop",
     content: "CrestBeam helped me establish my tutorial center with their education-focused loan package. Their commitment to supporting educational initiatives in Nigeria is commendable.",
     rating: 5
   }
@@ -410,10 +400,6 @@ export default function Home() {
                   dragElastic={0.2}
                   onDragEnd={(_, info) => handleSwipe(info)}
                   onDragStart={() => setIsSwiping(true)}
-                  onClick={() => {
-                    setLastInteraction(Date.now());
-                    setIsPaused(true);
-                  }}
                   whileTap={{ cursor: "grabbing" }}
                 >
                   {/* Mobile Swipe Indicator - Only visible initially */}
@@ -468,9 +454,9 @@ export default function Home() {
                     </div>
                   </motion.div>
 
-                  {/* Image Column */}
+                  {/* Content Column */}
                   <motion.div 
-                    className="relative h-[600px] bg-gradient-to-b from-primary/10 to-primary/5 rounded-2xl overflow-hidden order-2 md:order-1"
+                    className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-b from-primary/10 to-primary/5 rounded-2xl overflow-hidden order-2 md:order-1 p-12"
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.2}
@@ -504,16 +490,17 @@ export default function Home() {
                           mass: 0.8,
                           duration: 0.5 
                         }}
-                        className="absolute inset-0 flex items-center justify-center p-12"
+                        className="flex flex-col items-center justify-center text-center"
                       >
-                        <div className="w-full h-full relative">
-                          <Image
-                            src={testimonials[currentIndex].image}
-                            alt={testimonials[currentIndex].name}
-                            fill
-                            className="object-cover md:rounded-2xl rounded-full"
-                            priority
-                          />
+                        <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                          <User className="w-12 h-12 text-primary/50" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2">{testimonials[currentIndex].name}</h3>
+                        <p className="text-muted-foreground mb-6">{testimonials[currentIndex].role}</p>
+                        <div className="flex items-center gap-1">
+                          {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
+                            <Star key={i} className="w-5 h-5 text-primary fill-primary" />
+                          ))}
                         </div>
                       </motion.div>
                     </AnimatePresence>
